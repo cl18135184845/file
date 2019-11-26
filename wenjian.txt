@@ -1,0 +1,224 @@
+11/25：
+1.wx:key:"{{index}}/index"
+   作用：用来绑定当前列表中项目的特征，防止警告出现；
+   列表是静态页面：{{}}
+   列表是动态页面：id，保持原有项目整个状态不变
+   https://segmentfault.com/a/1190000017999005
+
+2.wx：for 循环
+   wx：for-item 变量名 随便起的
+   wx：for-items 循环 
+   wx:for等价与wx:for-items是循环数组用的；而wx:for-item则是给列表赋别名用的
+例如：
+ wx:for = "{{list}}" 用来循环数组
+如果是一维数组，实例：
+ 
+ <view wx:for="{{list}}">
+         {{index}} {{item.name}}  
+ </view>
+
+以上代码中item即为list的别名。
+如果是二维或多维数组：
+ 
+ <view wx:for="{{parentList}}">  
+ 　　{{item.id}} 
+　　<view wx:for="{{item.childList}}"  wx:for-item="items"> 
+             {{items.name}}{{item.account}}
+        </view> 
+ </view>
+
+
+3.<block>没有意义，仅仅是一个包装元素，相当于一个大括号，不会再页面做任何渲染；
+   使用block遇到的问题：布局问题:
+          让block中循环输出的内容横向布局只需要在block外面嵌套一个view标签就行
+<view style=“display='flex'”>
+
+  
+4.swiper获取当前页面的index值
+   swiper的属性：
+      current （number） 获取当前页面的index值
+      interval   自动切换时间间隔 5000
+      duration  滑动动画时长  500
+      circular   无缝滑动  false
+      vertical    滑动方向是否为纵向  false
+      bindchange    current改变时，触发change事件
+ swiper-item
+ swiper-view：scroll-y
+ 注意：宽和高为系统宽高：
+wx.getSystemInfo({
+ success: function(res) {
+ mtabW = res.windowWidth / 3; //设置tab的宽度
+that.setData({
+ tabW: mtabW,
+ windowHeight: res.windowHeight,
+ windowWidth: res.windowWidth,
+      })
+    }
+ });
+
+   
+5.  display: flex;align-items: center;justify-content: space-between;
+  <view class='list-msg2' bindtap='bindShowMsg'>
+          <text>{{tihuoWay}}</text>
+          <image style='height:60rpx;width:60rpx;' src='/images/xiala.png'></image>
+  </view>
+  .list-msg .list-msg2 {
+     display: flex;
+     align-items: center;//垂直方向对齐 居中对齐
+     justify-content: space-between;//水平方向对齐方式 两端对齐
+     border: 1px solid #ccc;
+    padding: 0 0 0 20rpx;
+    border-radius: 10rpx;
+}
+
+
+下拉：
+ <view class='list-msg'>
+        <view class='list-msg2' bindtap='bindShowMsg'>
+          <text>{{tihuoWay}}</text>
+          <image style='height:60rpx;width:60rpx;' src='/images/xiala.png'></image>
+        </view>
+        <!-- 下拉需要显示的列表 -->
+        <view class="select_box" wx:if="{{select}}">
+          <!-- <view class="select_one" bindtap="mySelect" data-name="全部">全部</view> -->
+          <view class="select_one" bindtap="mySelect" data-year="{{year}}">{{year}}</view>
+          <view class="select_one" bindtap="mySelect" data-year="{{year-1}}">{{year-1}}</view>
+        </view>
+</view>
+ //下拉展示年份
+  bindShowMsg() {
+    this.setData({
+      select: !this.data.select
+    })
+  },
+  //选择年份
+  mySelect(e) {
+    console.log(e.currentTarget.dataset.year)
+    var year = e.currentTarget.dataset.year
+    this.setData({
+      tihuoWay: year,
+      select: false
+    })
+    this.uporderlist()
+    this.upduihuanorder()
+    this.upsendorder()
+    this.upyewuorderlist();
+  },
+  
+  .list-msg {
+    width: 92%;
+    margin-left: 4%;
+    background-color: #fff;
+    position: relative;
+    border-radius: 10rpx;
+    margin-top: 20rpx;
+    margin-bottom: 10rpx
+   }
+ 
+.list-msg1 {
+    height: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+ 
+.list-msg .list-msg2 {
+    height: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+    padding: 0 0 0 20rpx;
+    border-radius: 10rpx
+  }
+ 
+.select_box {
+    background-color: #eee;
+    padding: 0 10rpx;
+    width: 93%;
+    position: absolute;
+    top: 65rpx;
+    z-index: 1;
+    overflow: hidden;
+    animation: myfirst 0.5s;
+    /*自定义动画 */
+    border-radius:10rpx;
+   }
+@keyframes myfirst {
+    from {
+        height: 0rpx;
+    }
+    to {
+        height: 210rpx;
+    }
+  }
+.select_one {
+    height: 60rpx;
+    line-height: 60rpx;
+    border-bottom: 1px solid #ccc;
+ }
+
+
+6.循环取数据
+  对象里边数组
+  {error: "0", msg: "ok",…}
+
+       that.data.DataInfo=[]
+        if (res.data.error == 0) {
+          for (var i = 0; i < res.data.data.length; i++) {
+            that.data.DataInfo.push(res.data.data[i])
+          }
+          that.setData({
+            orderlist: that.data.DataInfo,
+            show: true//显示数据 false 显示暂无数据 图标一直加载状态
+          })
+
+
+7.判断订单类型 
+ <view style=' padding-top: 3px;padding-bottom: 4px;'>订单类型
+    <label>:</label>
+    <label class='box' wx:if='{{item.stocktype=="T001"}}'>采购订单</label>
+    <label class='box' wx:if='{{item.stocktype=="T002"}}'>兑换订单</label>
+  </view>
+
+
+8.列表页接口有的字段直接带到详情页：
+   方法： url地址拼接  
+               列表页：wxml：data-字段（接口） 
+                              js ：url拼接
+               详情页：js：onload  this.setData  例如： orderid: e.orderid,
+                              wxml：例如：<label class='box'>{{orderid}}</label>
+<view class='oder' bindtap='orderInfo' wx:for='{{orderlist}}' 
+data-DELIVERYQUANTITY='{{item.DELIVERYQUANTITY}}' 
+data-RECEIVEDQUANTITY='{{item.RECEIVEDQUANTITY}}' 
+data-ORDERID='{{item.ORDERID}}' 
+data-DISTRIBUTORID='{{item.DISTRIBUTORID}}' 
+data-ORDERSTATUS='{{item.ORDERSTATUS}}' 
+data-DISTRIBUTORNAME="{{item.DISTRIBUTORNAME}}"
+
+orderInfo: function(e) {
+    console.log(e)
+    console.log(e.currentTarget.dataset)
+    console.log(e.currentTarget.dataset.type)
+    wx.navigateTo({
+      url: '../orderInfo/orderInfo?type=' + e.currentTarget.dataset.type + '&orderid=' + e.currentTarget.dataset.orderid + '&distributorid=' + e.currentTarget.dataset.distributorid + '&deliveryquantity=' + e.currentTarget.dataset.deliveryquantity + '&receivedquantity=' + e.currentTarget.dataset.receivedquantity + '&orderstatus=' + e.currentTarget.dataset.orderstatus + '&distributorname=' + e.currentTarget.dataset.distributorname,
+    })
+   
+  },
+  
+   onLoad: function (e) {
+    var that = this;
+    console.log(e)
+    that.setData({
+      orderid: e.orderid,
+      distributorid: e.distributorid,
+      orderstatus: e.orderstatus,
+      deliveryquantity: e.deliveryquantity,
+      distributorname: e.distributorname
+    })
+    <view style=' padding-top: 3px;'>
+    <label style='letter-spacing:7px;'>订单号</label>
+    <label>:</label>
+    <label class='box'>{{orderid}}</label>
+  </view>
+
